@@ -9,7 +9,7 @@ namespace VSColorOutput.State
     [Guid("BE905985-26BB-492B-9453-743E26F4E8BB")]
     public class VsColorOutputOptionsDialog : DialogPage
     {
-        public const string Category = "VSColorOutput";
+        public const string Category = "VSColorOutput64";
         public const string SubCategory = "General";
 
         private const string PatternsSubCategory = "Classifier Patterns";
