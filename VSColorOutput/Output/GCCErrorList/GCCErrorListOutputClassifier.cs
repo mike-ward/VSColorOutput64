@@ -37,12 +37,11 @@ namespace VSColorOutput.Output.GCCErrorList
         {
             try
             {
-                var spans = new List<ClassificationSpan>();
                 var snapshot = span.Snapshot;
-                if (snapshot == null || snapshot.Length == 0) return spans;
+                if (snapshot == null || snapshot.Length == 0) return Array.Empty<ClassificationSpan>();
                 if (_classifiers == null) UpdateClassifiers();
 
-                var classifiers = _classifiers ?? new List<Classifier>();
+                var classifiers = _classifiers;
                 var start = span.Start.GetContainingLine().LineNumber;
                 var end = (span.End - 1).GetContainingLine().LineNumber;
                 for (var i = start; i <= end; i++)
@@ -72,22 +71,22 @@ namespace VSColorOutput.Output.GCCErrorList
 
                     }
                 }
-                return spans;
+                return Array.Empty<ClassificationSpan>();
             }
             catch (FormatException)
             {
                 // eat it.
-                return new List<ClassificationSpan>();
+                return Array.Empty<ClassificationSpan>();
             }
             catch (RegexMatchTimeoutException)
             {
                 // eat it.
-                return new List<ClassificationSpan>();
+                return Array.Empty<ClassificationSpan>();
             }
             catch (NullReferenceException)
             {
                 // eat it.    
-                return new List<ClassificationSpan>();
+                return Array.Empty<ClassificationSpan>();
             }
             catch (Exception ex)
             {

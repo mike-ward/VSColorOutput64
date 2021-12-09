@@ -46,12 +46,12 @@ namespace VSColorOutput.Output.ColorClassifier
         {
             try
             {
-                var spans = new List<ClassificationSpan>();
                 var snapshot = span.Snapshot;
-                if (snapshot == null || snapshot.Length == 0) return spans;
+                if (snapshot == null || snapshot.Length == 0) return Array.Empty<ClassificationSpan>();
                 if (_classifiers == null) UpdateClassifiers();
 
-                var classifiers = _classifiers ?? new List<Classifier>();
+                List<ClassificationSpan> spans = null;
+                var classifiers = _classifiers;
                 var start = span.Start.GetContainingLine().LineNumber;
                 var end = (span.End - 1).GetContainingLine().LineNumber;
                 for (var i = start; i <= end; i++)
@@ -64,19 +64,23 @@ namespace VSColorOutput.Output.ColorClassifier
 
                     var classificationName = classifiers.First(classifier => classifier.Test(text)).Type;
                     var type = _classificationTypeRegistry.GetClassificationType(classificationName);
-                    if (type != null) spans.Add(new ClassificationSpan(line.Extent, type));
+                    if (type != null)
+                    {
+                        spans ??= new List<ClassificationSpan>();
+                        spans.Add(new ClassificationSpan(line.Extent, type));
+                    }
                 }
-                return spans;
+                return spans ?? (IList<ClassificationSpan>)Array.Empty<ClassificationSpan>();
             }
             catch (RegexMatchTimeoutException)
             {
                 // eat it.
-                return new List<ClassificationSpan>();
+                return Array.Empty<ClassificationSpan>();
             }
             catch (NullReferenceException)
             {
                 // eat it.
-                return new List<ClassificationSpan>();
+                return Array.Empty<ClassificationSpan>();
             }
             catch (Exception ex)
             {
@@ -88,7 +92,7 @@ namespace VSColorOutput.Output.ColorClassifier
         private void UpdateClassifiers()
         {
             var settings = Settings.Load();
-            var patterns = settings.Patterns ?? new RegExClassification[0];
+            var patterns = settings.Patterns ?? Array.Empty<RegExClassification>();
 
             var classifiers = patterns.Select(
                 pattern => new
