@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Reduce allocations during classification [b6fbc2d](https://github.com/mike-ward/VSColorOutput64/commit/b6fbc2d941752245b86f96310585c363a128d634)
-- Improve build duration logging [892692a]()https://github.com/mike-ward/VSColorOutput64/commit/892692a85189428cffe496bd6a2f63ca9d026147
+- Improve build duration logging [892692a](https://github.com/mike-ward/VSColorOutput64/commit/892692a85189428cffe496bd6a2f63ca9d026147)
 - Use transparancy in logo [46aa5b9](https://github.com/mike-ward/VSColorOutput64/commit/46aa5b977331042b701f736ff330246f6252f6f3)
 
 ## [2021.3] - 2021-06-20
