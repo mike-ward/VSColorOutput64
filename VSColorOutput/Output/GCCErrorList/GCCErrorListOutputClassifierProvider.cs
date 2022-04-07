@@ -11,7 +11,7 @@ namespace VSColorOutput.Output.GCCErrorList
 {
     [ContentType("output")]
     [Export(typeof(IClassifierProvider))]
-    class GCCErrorListOutputClassifierProvider : IClassifierProvider
+    internal class GCCErrorListOutputClassifierProvider : IClassifierProvider
     {
         private static GCCErrorListOutputClassifier _outputClassifier;
 
@@ -34,6 +34,7 @@ namespace VSColorOutput.Output.GCCErrorList
                 Log.LogError(ex.ToString());
                 throw;
             }
+
             return _outputClassifier;
         }
     }

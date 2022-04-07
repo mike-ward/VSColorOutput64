@@ -15,10 +15,11 @@ namespace VSColorOutput.Output.BuildEvents
     [ContentType("output")]
     public class BuildEventsProvider : IClassifierProvider
     {
-        [Import] internal SVsServiceProvider ServiceProvider;
+        [Import]
+        internal SVsServiceProvider ServiceProvider;
 
         private static BuildEvents _buildEvents;
-        public static BuildEvents BuildEvents => _buildEvents;
+        public static  BuildEvents BuildEvents => _buildEvents;
 
         public IClassifier GetClassifier(ITextBuffer textBuffer)
         {
@@ -39,8 +40,8 @@ namespace VSColorOutput.Output.BuildEvents
                 Log.LogError(ex.ToString());
                 throw;
             }
+
             return null;
         }
-
     }
 }

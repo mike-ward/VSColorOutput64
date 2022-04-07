@@ -9,12 +9,15 @@ namespace VSColorOutput.Output.TimeStamp
     [ContentType("DebugOutput")]
     [Export(typeof(IWpfTextViewMarginProvider))]
     [Order(Before = PredefinedMarginNames.Spacer)]
-    [TextViewRole(PredefinedTextViewRoles.Interactive)]   
+    [TextViewRole(PredefinedTextViewRoles.Interactive)]
     [MarginContainer(PredefinedMarginNames.LeftSelection)]
     public class TimeStampMarginProvider : IWpfTextViewMarginProvider
     {
-        [Import] internal IClassificationFormatMapService ClassificationFormatMappingService { get; private set; }
-        [Import] internal IClassificationTypeRegistryService ClassificationTypeRegistryService { get; private set; }
+        [Import]
+        internal IClassificationFormatMapService ClassificationFormatMappingService { get; private set; }
+
+        [Import]
+        internal IClassificationTypeRegistryService ClassificationTypeRegistryService { get; private set; }
 
         public static bool Initialized { get; private set; }
 

@@ -13,8 +13,11 @@ namespace VSColorOutput.FindResults
     [Export(typeof(IClassifierProvider))]
     public class FindResultsClassifierProvider : IClassifierProvider
     {
-        [Import] internal IClassificationTypeRegistryService ClassificationRegistry;
-        [Import] internal IClassificationFormatMapService ClassificationFormatMapService;
+        [Import]
+        internal IClassificationTypeRegistryService ClassificationRegistry;
+
+        [Import]
+        internal IClassificationFormatMapService ClassificationFormatMapService;
 
         private static FindResultsClassifier _findResultsClassifier;
 
@@ -29,6 +32,7 @@ namespace VSColorOutput.FindResults
 
                 _findResultsClassifier.Initialize(ClassificationRegistry, ClassificationFormatMapService);
             }
+
             return _findResultsClassifier;
         }
     }

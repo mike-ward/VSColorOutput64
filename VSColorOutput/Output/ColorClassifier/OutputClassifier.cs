@@ -14,10 +14,10 @@ namespace VSColorOutput.Output.ColorClassifier
 {
     public class OutputClassifier : IClassifier
     {
-        private int _initialized;
-        private IList<Classifier> _classifiers;
+        private int                                _initialized;
+        private IList<Classifier>                  _classifiers;
         private IClassificationTypeRegistryService _classificationTypeRegistry;
-        private IClassificationFormatMapService _formatMapService;
+        private IClassificationFormatMapService    _formatMapService;
 
         public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
 
@@ -27,7 +27,7 @@ namespace VSColorOutput.Output.ColorClassifier
             try
             {
                 _classificationTypeRegistry = registry;
-                _formatMapService = formatMapService;
+                _formatMapService           = formatMapService;
 
                 Settings.SettingsUpdated += (sender, args) =>
                 {
@@ -50,26 +50,27 @@ namespace VSColorOutput.Output.ColorClassifier
                 if (snapshot == null || snapshot.Length == 0) return Array.Empty<ClassificationSpan>();
                 if (_classifiers == null) UpdateClassifiers();
 
-                List<ClassificationSpan> spans = null;
-                var classifiers = _classifiers;
-                var start = span.Start.GetContainingLine().LineNumber;
-                var end = (span.End - 1).GetContainingLine().LineNumber;
+                List<ClassificationSpan> spans       = null;
+                var                      classifiers = _classifiers;
+                var                      start       = span.Start.GetContainingLine().LineNumber;
+                var                      end         = (span.End - 1).GetContainingLine().LineNumber;
                 for (var i = start; i <= end; i++)
                 {
                     var line = snapshot.GetLineFromLineNumber(i);
                     if (line == null) continue;
                     var snapshotSpan = new SnapshotSpan(line.Start, line.Length);
-                    var text = line.Snapshot.GetText(snapshotSpan);
+                    var text         = line.Snapshot.GetText(snapshotSpan);
                     if (string.IsNullOrEmpty(text)) continue;
 
                     var classificationName = classifiers.First(classifier => classifier.Test(text)).Type;
-                    var type = _classificationTypeRegistry.GetClassificationType(classificationName);
+                    var type               = _classificationTypeRegistry.GetClassificationType(classificationName);
                     if (type != null)
                     {
                         spans ??= new List<ClassificationSpan>();
                         spans.Add(new ClassificationSpan(line.Extent, type));
                     }
                 }
+
                 return spans ?? (IList<ClassificationSpan>)Array.Empty<ClassificationSpan>();
             }
             catch (RegexMatchTimeoutException)
@@ -95,17 +96,17 @@ namespace VSColorOutput.Output.ColorClassifier
             var patterns = settings.Patterns ?? Array.Empty<RegExClassification>();
 
             var classifiers = patterns.Select(
-                pattern => new
-                {
-                    classificationType = pattern.ClassificationType.ToString(),
-                    test = RegExClassification.RegExFactory(pattern)
-                })
-                .Select(temp => new Classifier
+                    pattern => new
+                    {
+                        classificationType = pattern.ClassificationType.ToString(),
+                        test               = RegExClassification.RegExFactory(pattern)
+                    })
+               .Select(temp => new Classifier
                 {
                     Type = temp.classificationType,
                     Test = text => temp.test.IsMatch(text)
                 })
-                .ToList();
+               .ToList();
 
             classifiers.Add(new Classifier
             {
@@ -118,7 +119,7 @@ namespace VSColorOutput.Output.ColorClassifier
 
         private void UpdateFormatMap()
         {
-            var colorMap = ColorMap.GetMap();
+            var colorMap  = ColorMap.GetMap();
             var formatMap = _formatMapService.GetClassificationFormatMap("output");
             try
             {
@@ -139,9 +140,9 @@ namespace VSColorOutput.Output.ColorClassifier
                 foreach (var name in classificationNames)
                 {
                     var classificationType = _classificationTypeRegistry.GetClassificationType(name);
-                    var textProperties = formatMap.GetTextProperties(classificationType);
-                    var color = colorMap[name];
-                    var wpfColor = ClassificationTypeDefinitions.ToMediaColor(color);
+                    var textProperties     = formatMap.GetTextProperties(classificationType);
+                    var color              = colorMap[name];
+                    var wpfColor           = ClassificationTypeDefinitions.ToMediaColor(color);
                     formatMap.SetTextProperties(classificationType, textProperties.SetForeground(wpfColor));
                 }
             }

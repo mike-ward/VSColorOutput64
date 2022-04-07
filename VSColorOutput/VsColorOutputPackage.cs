@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using VSColorOutput.State;
-using Task = System.Threading.Tasks.Task;
 
 namespace VSColorOutput
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [Guid(VSColorOutputPackage.PackageGuidString)]
+    [Guid(PackageGuidString)]
     [ProvideOptionPage(typeof(VsColorOutputOptionsDialog), VsColorOutputOptionsDialog.Category, VsColorOutputOptionsDialog.SubCategory, 1000, 1001, true)]
     [ProvideProfile(typeof(VsColorOutputOptionsDialog), VsColorOutputOptionsDialog.Category, VsColorOutputOptionsDialog.SubCategory, 1000, 1001, true)]
     [InstalledProductRegistration("VSColorOutput64", "Color output for build and debug windows - https://mike-ward.net/vscoloroutput", "2022.1")]
@@ -18,7 +18,7 @@ namespace VSColorOutput
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
         }
     }
 }

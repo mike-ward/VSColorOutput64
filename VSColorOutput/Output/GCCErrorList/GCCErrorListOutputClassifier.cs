@@ -10,10 +10,10 @@ using VSColorOutput.State;
 
 namespace VSColorOutput.Output.GCCErrorList
 {
-    class GCCErrorListOutputClassifier : IClassifier
+    internal class GCCErrorListOutputClassifier : IClassifier
     {
-        private int _initialized;
-        private IList<Classifier> _classifiers;
+        private int                                               _initialized;
+        private IList<Classifier>                                 _classifiers;
         public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
 
         public void Initialize()
@@ -42,14 +42,14 @@ namespace VSColorOutput.Output.GCCErrorList
                 if (_classifiers == null) UpdateClassifiers();
 
                 var classifiers = _classifiers;
-                var start = span.Start.GetContainingLine().LineNumber;
-                var end = (span.End - 1).GetContainingLine().LineNumber;
+                var start       = span.Start.GetContainingLine().LineNumber;
+                var end         = (span.End - 1).GetContainingLine().LineNumber;
                 for (var i = start; i <= end; i++)
                 {
                     var line = snapshot.GetLineFromLineNumber(i);
                     if (line == null) continue;
                     var snapshotSpan = new SnapshotSpan(line.Start, line.Length);
-                    var text = line.Snapshot.GetText(snapshotSpan);
+                    var text         = line.Snapshot.GetText(snapshotSpan);
                     if (string.IsNullOrEmpty(text)) continue;
 
                     var classificationName = classifiers.FirstOrDefault(classifier => classifier.Test(text)).Type;
@@ -57,6 +57,7 @@ namespace VSColorOutput.Output.GCCErrorList
                     {
                         continue;
                     }
+
                     switch (classificationName)
                     {
                         case ClassificationTypeDefinitions.LogError:
@@ -68,9 +69,9 @@ namespace VSColorOutput.Output.GCCErrorList
                         case ClassificationTypeDefinitions.LogInfo:
                             GCCErrorGenerator.AddMessage(GCCErrorListItem.Parse(text));
                             break;
-
                     }
                 }
+
                 return Array.Empty<ClassificationSpan>();
             }
             catch (FormatException)
@@ -104,14 +105,14 @@ namespace VSColorOutput.Output.GCCErrorList
                     pattern => new
                     {
                         classificationType = pattern.ClassificationType.ToString(),
-                        test = RegExClassification.RegExFactory(pattern)
+                        test               = RegExClassification.RegExFactory(pattern)
                     })
-                .Select(temp => new Classifier
+               .Select(temp => new Classifier
                 {
                     Type = temp.classificationType,
                     Test = temp.test.IsMatch
                 })
-                .ToList();
+               .ToList();
 
             classifiers.Add(new Classifier
             {
