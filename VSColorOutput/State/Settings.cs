@@ -212,7 +212,7 @@ namespace VSColorOutput.State
                 },
                 new RegExClassification
                 {
-                    RegExPattern       = @"(\W|^)^(?!.*warning\s(BC|CS|CA)\d+:).*((?<!/)error|fail|failed|exception)[^\w\.\-\+]",
+                    RegExPattern       = @"(\W|^)^(?!.*warning\s(BC|CS|CA)\d+:).*((?<!/)error|fail|crit|failed|exception)[^\w\.\-\+]",
                     ClassificationType = ClassificationTypes.LogError,
                     IgnoreCase         = true
                 },
@@ -230,13 +230,13 @@ namespace VSColorOutput.State
                 },
                 new RegExClassification
                 {
-                    RegExPattern       = @"(\W|^)warning\W",
+                    RegExPattern       = @"(\W|^)(warning|warn)\W",
                     ClassificationType = ClassificationTypes.LogWarning,
                     IgnoreCase         = true
                 },
                 new RegExClassification
                 {
-                    RegExPattern       = @"(\W|^)information\W",
+                    RegExPattern       = @"(\W|^)(information|info)\W",
                     ClassificationType = ClassificationTypes.LogInformation,
                     IgnoreCase         = true
                 },

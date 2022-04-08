@@ -55,6 +55,12 @@ namespace Tests
         [DataRow(" 0 Error(s)", ClassificationTypeDefinitions.BuildHead)]
         [DataRow("Could not find file", ClassificationTypeDefinitions.LogError)]
         [DataRow("warning CS0168: The variable \'exception\'", ClassificationTypeDefinitions.LogWarn)]
+        [DataRow("[11:15:27.531394] info: some mundane information message", ClassificationTypeDefinitions.LogInfo)]
+        [DataRow("[11:15:27.531394] warn: a message to notify a user", ClassificationTypeDefinitions.LogWarn)]
+        [DataRow("[11:15:27.531394] trce: random trace message", ClassificationTypeDefinitions.BuildText)]
+        [DataRow("[11:15:27.531394] dbug: random debug message", ClassificationTypeDefinitions.BuildText)]
+        [DataRow("[11:15:27.531394] fail: failure description", ClassificationTypeDefinitions.LogError)]
+        [DataRow("[11:15:27.531394] crit: failure description", ClassificationTypeDefinitions.LogError)]
         [DataTestMethod]
         public void GetClassificationSpansFromSnapShot(string pattern, string classification)
         {
