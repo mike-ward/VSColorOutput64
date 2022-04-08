@@ -44,12 +44,12 @@ namespace VSColorOutput.Output.BuildEvents
         {
             if (Interlocked.CompareExchange(ref _initialized, 1, 0) == 1) return;
 
+#pragma warning disable VSSDK006 // Check services exist
             _sbm = serviceProvider.GetService(typeof(SVsSolutionBuildManager)) as IVsSolutionBuildManager2;
 
             // NOTE this class is never disposed, so we don't track the cookie here and don't unadvise on disposal
             ErrorHandler.ThrowOnFailure(_sbm!.AdviseUpdateSolutionEvents(this, out _));
 
-#pragma warning disable VSSDK006 // Check services exist
             _dte2 = serviceProvider.GetService(typeof(DTE)) as DTE2;
 #pragma warning restore VSSDK006 // Check services exist
             if (_dte2 != null)
