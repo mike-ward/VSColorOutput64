@@ -1,9 +1,9 @@
-using System;
-using System.ComponentModel.Composition;
-using System.Threading;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
+using System;
+using System.ComponentModel.Composition;
+using System.Threading;
 using VSColorOutput.State;
 
 #pragma warning disable 649

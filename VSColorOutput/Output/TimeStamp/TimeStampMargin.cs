@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Text.Editor;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,9 +9,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Classification;
-using Microsoft.VisualStudio.Text.Editor;
 using VSColorOutput.Output.BuildEvents;
 using VSColorOutput.Output.ColorClassifier;
 using VSColorOutput.State;

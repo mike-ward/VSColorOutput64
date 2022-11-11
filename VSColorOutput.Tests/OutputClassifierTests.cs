@@ -1,9 +1,9 @@
-using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Moq;
+using System;
 using VSColorOutput.Output.ColorClassifier;
 using VSColorOutput.State;
 

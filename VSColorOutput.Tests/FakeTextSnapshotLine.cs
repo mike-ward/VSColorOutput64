@@ -1,5 +1,5 @@
-using System;
 using Microsoft.VisualStudio.Text;
+using System;
 
 namespace Tests
 {

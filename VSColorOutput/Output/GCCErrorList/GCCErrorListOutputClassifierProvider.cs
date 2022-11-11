@@ -1,10 +1,10 @@
-﻿using System;
-using System.ComponentModel.Composition;
-using System.Threading;
-using Microsoft.VisualStudio.Shell;
+﻿using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
+using System;
+using System.ComponentModel.Composition;
+using System.Threading;
 using VSColorOutput.State;
 
 namespace VSColorOutput.Output.GCCErrorList

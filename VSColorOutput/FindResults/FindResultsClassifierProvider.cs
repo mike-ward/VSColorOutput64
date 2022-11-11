@@ -1,8 +1,8 @@
-using System.ComponentModel.Composition;
-using System.Threading;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
+using System.ComponentModel.Composition;
+using System.Threading;
 
 // Unassigned variables
 #pragma warning disable 649
