@@ -1,11 +1,11 @@
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Classification;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Media;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Classification;
 using VSColorOutput.Output.ColorClassifier;
 using VSColorOutput.State;
 

@@ -1,6 +1,6 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using VSColorOutput.Output.ColorClassifier;
 
 // ReSharper disable ObjectCreationAsStatement

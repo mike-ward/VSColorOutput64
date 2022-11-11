@@ -1,11 +1,11 @@
-﻿using System;
-using EnvDTE;
+﻿using EnvDTE;
 using EnvDTE80;
 using FluentAssertions;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 // ReSharper disable RedundantArgumentDefaultValue
 

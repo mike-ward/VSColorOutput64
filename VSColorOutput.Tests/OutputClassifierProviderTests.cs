@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.Composition;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
+using System.ComponentModel.Composition;
 using VSColorOutput.Output.ColorClassifier;
 
 namespace Tests
