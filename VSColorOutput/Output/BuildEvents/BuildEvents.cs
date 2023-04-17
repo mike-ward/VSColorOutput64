@@ -28,6 +28,7 @@ namespace VSColorOutput.Output.BuildEvents
         private int                      _initialized;
         private List<string>             _projectsBuildReport;
         private IVsSolutionBuildManager2 _sbm;
+        private  string                  _buildConfig = string.Empty;
 
         public        bool     StopOnBuildErrorEnabled     { get; set; }
         public        bool     ShowElapsedBuildTimeEnabled { get; set; }
@@ -122,7 +123,7 @@ namespace VSColorOutput.Output.BuildEvents
             if (ShowBuildReport)
             {
                 buildOutputPane.OutputString($"{Environment.NewLine}Projects build report:{Environment.NewLine}");
-                buildOutputPane.OutputString($"  Status    | Project [Config|platform]{Environment.NewLine}");
+                buildOutputPane.OutputString($"  Status    | Project [{_buildConfig}]{Environment.NewLine}");
                 buildOutputPane.OutputString($" -----------|---------------------------------------------------------------------------------------------------{Environment.NewLine}");
                 foreach (var reportItem in _projectsBuildReport)
                 {
@@ -172,8 +173,9 @@ namespace VSColorOutput.Output.BuildEvents
             {
                 ErrorHandler.ThrowOnFailure(pHierProj.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_Name, out var project));
                 pCfgProj.get_DisplayName(out var displayName);
+                _buildConfig = displayName;
 
-                _projectsBuildReport.Add($"  {(success ? "Succeeded" : "Failed   ")} | {project} [{displayName}]");
+                _projectsBuildReport.Add($"  {(success ? "Succeeded" : "Failed   ")} | {project}");
             }
 
             return VSConstants.S_OK;
