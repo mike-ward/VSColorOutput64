@@ -12,6 +12,6 @@ Developed in C#
   
 Colors can be edited from the Fonts and Colors dialog under the Text Editor category. Look for items starting with "VSColorOutput".  
   
-An option page is is used to add custom match expressions.  
+An options page is used to add custom match expressions.  
   
 ([More Information](https://mike-ward.net/vscoloroutput))
