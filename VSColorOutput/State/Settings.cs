@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Runtime.Serialization;
@@ -12,7 +13,7 @@ namespace VSColorOutput.State
     public class Settings
     {
         public const string DefaultTimeStampFormat = "mm':'ss':'fff";
-        public const string RegistryPath           = @"DialogPage\BlueOnionSoftware.VsColorOutputOptions";
+        public const string RegistryPath = @"DialogPage\BlueOnionSoftware.VsColorOutputOptions";
 
         [DataMember(Order = 0)]
         public bool EnableStopOnBuildError { get; set; }
@@ -97,9 +98,9 @@ namespace VSColorOutput.State
 
         private static string GetSettingsFilePath()
         {
-            const string name         = "vscoloroutput.json";
-            var          settingsPath = Path.Combine(ProgramDataFolder, name);
-            var          solutionPath = BuildEvents.SolutionPath;
+            const string name = "vscoloroutput.json";
+            var settingsPath = Path.Combine(ProgramDataFolder, name);
+            var solutionPath = BuildEvents.SolutionPath;
 
             if (solutionPath != null)
             {
@@ -122,29 +123,48 @@ namespace VSColorOutput.State
             return settingsPath;
         }
 
+        private static Settings NewLoad(string filePath)
+        {
+            var json = File.ReadAllText(filePath);
+            return JsonConvert.DeserializeObject<Settings>(json);   
+        }
+
+        private static Settings OldLoad(string filePath)
+        {
+            using var stream = new FileStream(GetSettingsFilePath(), FileMode.Open);
+            var deserialize = new DataContractJsonSerializer(typeof(Settings));
+            return (Settings)deserialize.ReadObject(stream);
+        }
+
         public static Settings Load()
         {
-            if (Runtime.RunningUnitTests) return new Settings();
             Directory.CreateDirectory(ProgramDataFolder);
-            using (var stream = new FileStream(GetSettingsFilePath(), FileMode.Open))
+            var filePath = GetSettingsFilePath();
+            Settings settings;
+
+            try
             {
-                var deserialize = new DataContractJsonSerializer(typeof(Settings));
-                var settings    = (Settings)deserialize.ReadObject(stream);
-                // set missing colors
-                if (settings.BuildMessageColor == Color.Empty) settings.BuildMessageColor       = Color.Green;
-                if (settings.BuildTextColor == Color.Empty) settings.BuildTextColor             = Color.Gray;
-                if (settings.ErrorTextColor == Color.Empty) settings.ErrorTextColor             = Color.Red;
-                if (settings.WarningTextColor == Color.Empty) settings.WarningTextColor         = Color.Olive;
-                if (settings.InformationTextColor == Color.Empty) settings.InformationTextColor = Color.DarkBlue;
-                if (settings.CustomTextColor1 == Color.Empty) settings.CustomTextColor1         = Color.DarkOrange;
-                if (settings.CustomTextColor2 == Color.Empty) settings.CustomTextColor2         = Color.DarkSalmon;
-                if (settings.CustomTextColor3 == Color.Empty) settings.CustomTextColor3         = Color.Purple;
-                if (settings.CustomTextColor4 == Color.Empty) settings.CustomTextColor4         = Color.Brown;
-                if (settings.FindSearchTermColor == Color.Empty) settings.FindSearchTermColor   = Color.Green;
-                if (settings.FindFileNameColor == Color.Empty) settings.FindFileNameColor       = Color.Gray;
-                if (settings.TimeStampColor == Color.Empty) settings.TimeStampColor             = Color.CornflowerBlue;
-                return settings;
+                settings = NewLoad(filePath);
             }
+            catch
+            {
+                settings = OldLoad(filePath);
+            }
+
+            // set missing colors
+            if (settings.BuildMessageColor == Color.Empty) settings.BuildMessageColor = Color.Green;
+            if (settings.BuildTextColor == Color.Empty) settings.BuildTextColor = Color.Gray;
+            if (settings.ErrorTextColor == Color.Empty) settings.ErrorTextColor = Color.Red;
+            if (settings.WarningTextColor == Color.Empty) settings.WarningTextColor = Color.Olive;
+            if (settings.InformationTextColor == Color.Empty) settings.InformationTextColor = Color.DarkBlue;
+            if (settings.CustomTextColor1 == Color.Empty) settings.CustomTextColor1 = Color.DarkOrange;
+            if (settings.CustomTextColor2 == Color.Empty) settings.CustomTextColor2 = Color.DarkSalmon;
+            if (settings.CustomTextColor3 == Color.Empty) settings.CustomTextColor3 = Color.Purple;
+            if (settings.CustomTextColor4 == Color.Empty) settings.CustomTextColor4 = Color.Brown;
+            if (settings.FindSearchTermColor == Color.Empty) settings.FindSearchTermColor = Color.Green;
+            if (settings.FindFileNameColor == Color.Empty) settings.FindFileNameColor = Color.Gray;
+            if (settings.TimeStampColor == Color.Empty) settings.TimeStampColor = Color.CornflowerBlue;
+            return settings;
         }
 
         public void Save()
@@ -157,11 +177,8 @@ namespace VSColorOutput.State
 
         public void SaveToFile(string path)
         {
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                var serializer = new DataContractJsonSerializer(typeof(Settings));
-                serializer.WriteObject(stream, this);
-            }
+            var json = JsonConvert.SerializeObject(this, Formatting.Indented);
+            File.WriteAllText(path, json);
         }
 
         private static RegExClassification[] DefaultPatterns()
