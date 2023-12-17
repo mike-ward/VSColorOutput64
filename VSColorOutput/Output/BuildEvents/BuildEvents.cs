@@ -21,30 +21,31 @@ namespace VSColorOutput.Output.BuildEvents
     {
         private readonly Stopwatch _buildDurationStopwatch = new Stopwatch();
 
-        private DTE2                     _dte2;
-        private Events                   _events;
-        private DTEEvents                _dteEvents;
-        private SolutionEvents           _solutionEvents;
-        private int                      _initialized;
-        private List<string>             _projectsBuildReport;
+        private DTE2 _dte2;
+        private Events _events;
+        private DTEEvents _dteEvents;
+        private int _initialized;
+        private List<string> _projectsBuildReport;
+        private IVsSolution _solutionService;
         private IVsSolutionBuildManager2 _sbm;
-        private  string                  _buildConfig = string.Empty;
+        private string _buildConfig = string.Empty;
 
-        public        bool     StopOnBuildErrorEnabled     { get; set; }
-        public        bool     ShowElapsedBuildTimeEnabled { get; set; }
-        public        string   ElapsedTimeFormatString     { get; set; }
-        public        bool     ShowBuildReport             { get; set; }
-        public        bool     ShowDebugWindowOnDebug      { get; set; }
-        public        bool     ShowTimeStamps              { get; set; }
-        public        DateTime DebugStartTime              { get; private set; }
-        public        bool     ShowDonation                { get; set; }
-        public static string   SolutionPath                { get; private set; }
+        public bool StopOnBuildErrorEnabled { get; set; }
+        public bool ShowElapsedBuildTimeEnabled { get; set; }
+        public string ElapsedTimeFormatString { get; set; }
+        public bool ShowBuildReport { get; set; }
+        public bool ShowDebugWindowOnDebug { get; set; }
+        public bool ShowTimeStamps { get; set; }
+        public DateTime DebugStartTime { get; private set; }
+        public bool ShowDonation { get; set; }
+        public static string SolutionPath { get; private set; }
 
         public void Initialize(IServiceProvider serviceProvider)
         {
             if (Interlocked.CompareExchange(ref _initialized, 1, 0) == 1) return;
 
 #pragma warning disable VSSDK006 // Check services exist
+            _solutionService = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
             _sbm = serviceProvider.GetService(typeof(SVsSolutionBuildManager)) as IVsSolutionBuildManager2;
 
             // NOTE this class is never disposed, so we don't track the cookie here and don't unadvise on disposal
@@ -56,23 +57,35 @@ namespace VSColorOutput.Output.BuildEvents
             {
                 // These event sources have to be rooted or the GC will collect them.
                 // https://social.msdn.microsoft.com/Forums/en-US/vsx/thread/fd2f9108-1df3-4d96-a65d-67a69347ca27
-                _events         = _dte2.Events;
-                _dteEvents      = _events.DTEEvents;
-                _solutionEvents = _events.SolutionEvents;
+                _events = _dte2.Events;
+                _dteEvents = _events.DTEEvents;
 
                 _dteEvents.ModeChanged += OnModeChanged;
-
-                if (_solutionEvents != null)
-                {
-                    _solutionEvents.Opened       += SolutionOpened;
-                    _solutionEvents.AfterClosing += () => SolutionPath = null;
-                }
             }
 
             _projectsBuildReport = new List<string>();
 
+            // If not started from Test session
+            if (_solutionService != null)
+            {
+                if (IsSolutionLoaded())
+                {
+                    SolutionOpened();
+                }
+
+                Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnAfterOpenSolution += (s, e) => SolutionOpened();
+                Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnAfterCloseSolution += (s, e) => SolutionClosed();
+            }
+
             Settings.SettingsUpdated += (sender, args) => LoadSettings();
             LoadSettings();
+        }
+
+        private bool IsSolutionLoaded()
+        {
+            _solutionService.GetProperty((int)__VSPROPID.VSPROPID_IsSolutionOpen, out object value);
+
+            return value is bool isSolOpen && isSolOpen;
         }
 
         public void SolutionOpened()
@@ -81,16 +94,21 @@ namespace VSColorOutput.Output.BuildEvents
             LoadSettings();
         }
 
+        public void SolutionClosed()
+        {
+            SolutionPath = null;
+        }
+
         private void LoadSettings()
         {
             var settings = Settings.Load();
-            StopOnBuildErrorEnabled     = settings.EnableStopOnBuildError;
+            StopOnBuildErrorEnabled = settings.EnableStopOnBuildError;
             ShowElapsedBuildTimeEnabled = settings.ShowElapsedBuildTime;
-            ElapsedTimeFormatString     = settings.TimeStampElapsed ?? @"hh\:mm\:ss\.fff";
-            ShowBuildReport             = settings.ShowBuildReport;
-            ShowDebugWindowOnDebug      = settings.ShowDebugWindowOnDebug;
-            ShowTimeStamps              = settings.ShowTimeStamps;
-            ShowDonation                = !settings.SuppressDonation;
+            ElapsedTimeFormatString = settings.TimeStampElapsed ?? @"hh\:mm\:ss\.fff";
+            ShowBuildReport = settings.ShowBuildReport;
+            ShowDebugWindowOnDebug = settings.ShowDebugWindowOnDebug;
+            ShowTimeStamps = settings.ShowTimeStamps;
+            ShowDonation = !settings.SuppressDonation;
         }
 
         /// <summary>Build is starting.</summary>
@@ -137,11 +155,11 @@ namespace VSColorOutput.Output.BuildEvents
                 // The next build must start it again, so that we don't end up timing across multiple builds.
                 _buildDurationStopwatch.Stop();
 
-                var elapsed     = _buildDurationStopwatch.Elapsed;
-                var time        = elapsed.ToString(ElapsedTimeFormatString);
-                var buildTime   = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                var elapsed = _buildDurationStopwatch.Elapsed;
+                var time = elapsed.ToString(ElapsedTimeFormatString);
+                var buildTime = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 var timeElapsed = $"Build time {time}";
-                var endedAt     = $"Build ended at {buildTime}";
+                var endedAt = $"Build ended at {buildTime}";
                 buildOutputPane.OutputString($"{Environment.NewLine}{timeElapsed}{Environment.NewLine}");
                 buildOutputPane.OutputString($"{endedAt}{Environment.NewLine}");
             }
