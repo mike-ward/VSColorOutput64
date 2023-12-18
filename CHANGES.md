@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- #19
+- Merge pull request #19, fixes per solution configurations.
 
 ## [2023.3] - 2023-04-25
 
