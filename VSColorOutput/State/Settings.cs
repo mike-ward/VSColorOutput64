@@ -193,7 +193,7 @@ namespace VSColorOutput.State
                 },
                 new RegExClassification
                 {
-                    RegExPattern       = @".*[t|c]sc\.exe.*",
+                    RegExPattern       = @"[t|c]sc\.exe",
                     ClassificationType = ClassificationTypes.BuildText,
                     IgnoreCase         = false
                 },
