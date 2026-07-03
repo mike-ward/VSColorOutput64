@@ -71,6 +71,15 @@ namespace VSColorOutput.State
         public bool FormatTimeInSystemLocale { get; set; }
 
         [Category(ActionSubCategory)]
+        [DisplayName("Hide Output Lines (RegEx)")]
+        [Description("Any output line matching this regular expression will be removed from the Output window.")]
+        public string HiddenLinesRegExPattern { get; set; }
+
+        [Category(ActionSubCategory)]
+        [DisplayName("Hide Output Lines Ignore Case")]
+        public bool HiddenLinesRegExIgnoreCase { get; set; }
+
+        [Category(ActionSubCategory)]
         [DisplayName("Yes, I Donated!")]
         [Description("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=REEP6X7DSPMZU")]
         public bool SuppressDonation { get; set; }
@@ -162,6 +171,8 @@ namespace VSColorOutput.State
             ShowTimeStampOnEveryLine = settings.ShowTimeStampOnEveryLine;
             ShowHoursInTimeStamps    = settings.ShowHoursInTimeStamps;
             FormatTimeInSystemLocale = settings.FormatTimeInSystemLocale;
+            HiddenLinesRegExPattern  = settings.HiddenLinesRegExPattern;
+            HiddenLinesRegExIgnoreCase = settings.HiddenLinesRegExIgnoreCase;
 
             RegExPatterns = settings.Patterns;
 
@@ -200,6 +211,8 @@ namespace VSColorOutput.State
                 ShowTimeStampOnEveryLine = ShowTimeStampOnEveryLine,
                 ShowHoursInTimeStamps    = ShowHoursInTimeStamps,
                 FormatTimeInSystemLocale = FormatTimeInSystemLocale,
+                HiddenLinesRegExPattern  = HiddenLinesRegExPattern,
+                HiddenLinesRegExIgnoreCase = HiddenLinesRegExIgnoreCase,
                 // ---
                 Patterns = RegExPatterns,
                 // ---

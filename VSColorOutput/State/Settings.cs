@@ -90,6 +90,12 @@ namespace VSColorOutput.State
         [DataMember(Order = 21)]
         public string TimeStampDifference { get; set; } = DefaultTimeStampFormat;
 
+        [DataMember(Order = 23)]
+        public string HiddenLinesRegExPattern { get; set; } = string.Empty;
+
+        [DataMember(Order = 24)]
+        public bool HiddenLinesRegExIgnoreCase { get; set; } = true;
+
         private static readonly string ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VSColorOutput64");
 
         public static event EventHandler SettingsUpdated;
