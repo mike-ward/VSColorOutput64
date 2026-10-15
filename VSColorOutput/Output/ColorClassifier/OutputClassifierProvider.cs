@@ -2,7 +2,10 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using VSColorOutput.State;
 
@@ -15,6 +18,10 @@ namespace VSColorOutput.Output.ColorClassifier
     [Export(typeof(IClassifierProvider))]
     public class OutputClassifierProvider : IClassifierProvider
     {
+        private const  string           SuppliedClassifierForThisBufferKey = "VSColorOutput.Output.SuppliedClassifierForThisTextBufferKey";
+        private const  string           BufferFilterStateKey = "VSColorOutput.Output.BufferLineFilterState";
+        private static readonly object  BufferFilterStateLock = new object();
+
         [Import]
         internal IClassificationTypeRegistryService ClassificationRegistry;
 
@@ -22,7 +29,6 @@ namespace VSColorOutput.Output.ColorClassifier
         internal IClassificationFormatMapService ClassificationFormatMapService;
 
         private static OutputClassifier _outputClassifier;
-        private const  string           SuppliedClassifierForThisBufferKey = "VSColorOutput.Output.SuppliedClassifierForThisTextBufferKey";
 
         public IClassifier GetClassifier(ITextBuffer buffer)
         {
@@ -40,6 +46,7 @@ namespace VSColorOutput.Output.ColorClassifier
                         _outputClassifier.Initialize(ClassificationRegistry, ClassificationFormatMapService);
                     }
 
+                    AttachHiddenLineFilter(buffer);
                     return _outputClassifier;
                 }
 
@@ -73,6 +80,91 @@ namespace VSColorOutput.Output.ColorClassifier
             }
 
             return false;
+        }
+
+        private static void AttachHiddenLineFilter(ITextBuffer buffer)
+        {
+            if (buffer.Properties.ContainsProperty(BufferFilterStateKey)) return;
+
+            EventHandler<TextContentChangedEventArgs> handler = null;
+            handler = (sender, args) => HideMatchingLines(buffer, handler, args);
+
+            lock (BufferFilterStateLock)
+            {
+                if (buffer.Properties.ContainsProperty(BufferFilterStateKey)) return;
+                buffer.Properties.AddProperty(BufferFilterStateKey, handler);
+                buffer.Changed += handler;
+            }
+        }
+
+        private static void HideMatchingLines(ITextBuffer buffer, EventHandler<TextContentChangedEventArgs> handler, TextContentChangedEventArgs args)
+        {
+            if (args == null || args.After == null || args.EditTag == BufferFilterStateKey) return;
+
+            try
+            {
+                var settings = Settings.Load();
+                if (settings == null || string.IsNullOrWhiteSpace(settings.HiddenLinesRegExPattern)) return;
+
+                var options = settings.HiddenLinesRegExIgnoreCase
+                    ? RegexOptions.IgnoreCase
+                    : RegexOptions.None;
+
+                var regex = new Regex(
+                    settings.HiddenLinesRegExPattern,
+                    options,
+                    TimeSpan.FromMilliseconds(250));
+
+                var spansToDelete = new List<Span>();
+                foreach (var change in args.Changes)
+                {
+                    var startLine = args.After.GetLineFromPosition(change.NewPosition).LineNumber;
+                    var endPosition = change.NewEnd > change.NewPosition ? change.NewEnd - 1 : change.NewPosition;
+                    var endLine = args.After.GetLineFromPosition(Math.Min(endPosition, Math.Max(args.After.Length - 1, 0))).LineNumber;
+
+                    for (var i = startLine; i <= endLine; i++)
+                    {
+                        var line = args.After.GetLineFromLineNumber(i);
+                        var text = line.GetText();
+                        if (!regex.IsMatch(text)) continue;
+
+                        var span = line.LineBreakLength > 0
+                            ? line.ExtentIncludingLineBreak.Span
+                            : line.Extent.Span;
+
+                        spansToDelete.Add(span);
+                    }
+                }
+
+                if (spansToDelete.Count == 0) return;
+
+                using (var edit = buffer.CreateEdit(EditOptions.DefaultMinimalChange, null, BufferFilterStateKey))
+                {
+                    foreach (var span in spansToDelete
+                                 .Distinct()
+                                 .OrderByDescending(s => s.Start))
+                    {
+                        edit.Delete(span);
+                    }
+
+                    if (edit.HasEffectiveChanges)
+                    {
+                        edit.Apply();
+                    }
+                }
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                // eat it.
+            }
+            catch (ArgumentException)
+            {
+                // eat it.
+            }
+            catch (Exception ex)
+            {
+                Log.LogError(ex.ToString());
+            }
         }
     }
 }

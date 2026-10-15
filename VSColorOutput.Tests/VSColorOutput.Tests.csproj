@@ -57,6 +57,7 @@
     <Compile Include="FakeTextSnapshotLine.cs" />
     <Compile Include="FindResultsClassifierProviderTests.cs" />
     <Compile Include="FindResultsClassifierTests.cs" />
+    <Compile Include="OutputClassifierProviderFilteringTests.cs" />
     <Compile Include="OutputClassifierProviderTests.cs" />
     <Compile Include="OutputClassifierTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
